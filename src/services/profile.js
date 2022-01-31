@@ -1,9 +1,10 @@
 import createAxios from './http';
-export const createNewProfile = async (userId, photoId) => {
+export const createNewProfile = async (userId, photoId, companyId) => {
   try {
     const response = await createAxios.post('/api/profiles', {
       data: {
         user: userId,
+        company: companyId,
         profilePhoto: photoId
       }
     });
@@ -13,12 +14,12 @@ export const createNewProfile = async (userId, photoId) => {
   }
 };
 
-export const getProfile = async (userId) => {
+export const getProfileById = async (userId) => {
   try {
-    const response = await createAxios.get('/api/profiles/', {
+    const response = await createAxios.get(`/api/profiles/`, {
       params: {
         'filters[user][id][$eq]': userId,
-        populate: 'profilePhoto'
+        populate: ['profilePhoto', 'company']
       }
     });
     return response;

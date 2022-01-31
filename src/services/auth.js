@@ -13,14 +13,9 @@ export const login = async ({ email, password }) => {
 };
 
 export const register = async ({ name, email, password }) => {
-  try {
-    const response = await createAxios.post('/api/auth/local/register', {
-      username: name,
-      email: email,
-      password: password
-    });
-    return response;
-  } catch (error) {
-    console.log('An error occurred:', error.response);
-  }
+  return createAxios.post('/api/auth/local/register', {
+    username: name,
+    email: email,
+    password: password
+  });
 };

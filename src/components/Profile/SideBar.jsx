@@ -16,7 +16,7 @@ const SideBar = () => {
       <Box p="10px 10px">
         <Link to="/pending-for-approval">Pending for approval</Link>
       </Box>
-      <Box p="10px 10px">
+      <Box p="10px 10px" >
         <Link to="/team" p="10px 10px">
           Team
         </Link>
