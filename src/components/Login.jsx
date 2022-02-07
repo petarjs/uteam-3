@@ -26,9 +26,6 @@ const Login = () => {
     e.preventDefault();
     if (email === '' || password === '') {
       setError(true);
-      setTimeout(() => {
-        setError(false);
-      }, 5000);
       return false;
     } else {
       const data = {
@@ -41,7 +38,7 @@ const Login = () => {
 
   return (
     <Flex justifyContent="center" alignItems="center">
-      <Box color="teal.400" textAlign="center" width={{ base: '300px', sm: '400px' }}>
+      <Box  color="teal.400" textAlign="center" w={{ base: '300px', sm: '400px' }}>
         <Text fontSize="24px" fontWeight="bold">
           uTeam - Login
         </Text>
@@ -103,4 +100,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default Login

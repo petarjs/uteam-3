@@ -2,7 +2,7 @@ import { Flex, Box } from '@chakra-ui/react';
 import SideBar from './SideBar';
 
 const PendingForApproval = () => {
-  return     <Flex minHeight="100vh" w="100vw" flexDirection={{ base: 'column', md: 'row' }}>
+  return <Flex   w="100vw" flexDirection={{ base: 'column', md: 'row' }}>
   <Box
     display="flex"
     bg="teal.400"

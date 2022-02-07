@@ -3,7 +3,7 @@ import SideBar from './SideBar';
 
 const MyProfile = () => {
   return (
-    <Flex minHeight="100vh" w="100vw" flexDirection={{ base: 'column', md: 'row' }}>
+    <Flex w="100vw" flexDirection={{ base: 'column', md: 'row' }}>
       <Box
         display="flex"
         bg="teal.400"
