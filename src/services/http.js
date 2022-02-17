@@ -13,11 +13,8 @@ const createAxios = axios.create(
   }
 );
 
-
 createAxios.interceptors.request.use((req) => {
   const token = localStorage.getItem('token');
-  //debugger
-  
   // Throws an error for bad token
   try {
     //console.log(jwtDecode(token));

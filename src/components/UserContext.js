@@ -1,11 +1,12 @@
 import { createContext, useState, useContext, useEffect } from 'react';
-import { login, register } from '../services/auth';
-import createAxios from '../services/http';
 import { useNavigate } from 'react-router-dom';
-import { getProfile, createNewProfile } from '../services/profile';
+import ProtectedRoute from '../ProtectedRoute';
+import createAxios from '../services/http';
+import { login, register } from '../services/auth';
+import { getProfileById, createNewProfile } from '../services/profile';
 import { createCompany } from '../services/company';
 import { uploadUserPhoto } from '../services/upload';
-import ProtectedRoute from '../ProtectedRoute';
+
 const AuthContext = createContext();
 const useAuthContext = () => useContext(AuthContext);
 const AuthProvider = ({ children }) => {
@@ -13,14 +14,20 @@ const AuthProvider = ({ children }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userPhoto, setUserPhoto] = useState();
   const [username, setUserName] = useState();
+  const [email, setEmail] = useState();
+  const [idCompany, setCompanyId] = useState();
+  const navigate = useNavigate();
+
   useEffect(() => {
     createAxios
-      .get('https://uteam-api-7nngy.ondigitalocean.app/api/users/me')
+      .get(process.env.REACT_APP_API_URL + '/api/users/me')
       .then((res) => {
         setUser(res.data);
-        setUserName(res.data.username);
-        getProfile(res.data.id).then((response) => {
+        setEmail(res.data.email);
+        getProfileById(res.data.id).then((response) => {
+          setUserName(response.data.data[0].attributes.name);
           setUserPhoto(response.data.data[0].attributes.profilePhoto.data.attributes.url);
+          setCompanyId(response.data.data[0].attributes.company.data.id);
         });
         setIsLoggedIn(true);
         navigate(<ProtectedRoute />);
@@ -28,53 +35,56 @@ const AuthProvider = ({ children }) => {
       .catch((err) => {
         setUser(null);
         setIsLoggedIn(false);
-        // navigate('/');
       });
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-  const navigate = useNavigate();
+
   const registerFunction = async (payload, formData) => {
     try {
       let authUser = await register(payload);
-      if (authUser.data.user) {
-        setUserName(authUser.data.user.username);
-        setIsLoggedIn(true);
-        setUser(authUser.data);
-        localStorage.setItem('token', authUser.data.jwt);
-        let companyRes = await createCompany(payload.company);
-        console.log("blabla",companyRes)
-        const photoResponse = await uploadUserPhoto(formData);
-        await createNewProfile(
-          authUser.data.user.id,
-          photoResponse.data[0].id,
-          companyRes.data.data.id
-        );
-        const userProfile = await getProfile(authUser.data.user.id);
-        setUserPhoto(userProfile.data.data[0].attributes.profilePhoto.data.attributes.url);
-        navigate('/my-profile');
-      }
+      setEmail(authUser.data.user.email);
+      setIsLoggedIn(true);
+      setUser(authUser.data);
+      setUserName(authUser.data.user.username);
+      console.log('user', authUser);
+      console.log('id usera', authUser.data.user.id);
+      localStorage.setItem('token', authUser.data.jwt);
+      const photoResponse = await uploadUserPhoto(formData);
+      const companyResponse = await createCompany(payload.company);
+      console.log('companyRes', companyResponse);
+      await createNewProfile(
+        authUser.data.user.id,
+        photoResponse.data[0].id,
+        authUser.data.user.username,
+        companyResponse.data.data.id
+      );
+      const userProfile = await getProfileById(authUser.data.user.id);
+      console.log('id profila', userProfile.data.data[0].id);
+      console.log('profile', userProfile);
+      setUserPhoto(userProfile.data.data[0].attributes.profilePhoto.data.attributes.url);
+      navigate('/my-profile');
     } catch (error) {
-      console.error(error);
+      throw error.response.data.error.message;
     }
   };
+
   const loginFunction = async (payload) => {
     try {
       const authUser = await login(payload);
-
-      setUserName(authUser.data.user.username);
-      getProfile(authUser.data.user.id).then((response) => {
-        setUserPhoto(response.data.data[0].attributes.profilePhoto.data.attributes.url);
-      });
-
       if (authUser) {
+        setUser(authUser);
+        setEmail(authUser.data.user.email);
+        getProfileById(authUser.data.user.id).then((response) => {
+          setUserName(response.data.data[0].attributes.name);
+          setUserPhoto(response.data.data[0].attributes.profilePhoto.data.attributes.url);
+          setCompanyId(response.data.data[0].attributes.company.data.id);
+        });
         localStorage.setItem('token', authUser.data.jwt);
         setIsLoggedIn(true);
-        setUser(authUser);
-
+        console.log('id usera', authUser.data.user.id);
         navigate('/my-profile');
-      } else {
-        console.log('failed login');
-        navigate('/');
+        const userProfile = await getProfileById(authUser.data.user.id);
+        console.log('id profila', userProfile.data.data[0].id);
       }
     } catch (error) {
       console.error(error);
@@ -86,8 +96,10 @@ const AuthProvider = ({ children }) => {
     localStorage.removeItem('token');
     setUserPhoto(null);
     setUserName(null);
+    setEmail(null);
     setIsLoggedIn(false);
   };
+
   return (
     <AuthContext.Provider
       value={{
@@ -97,7 +109,11 @@ const AuthProvider = ({ children }) => {
         registerFunction,
         isLoggedIn,
         userPhoto,
-        username
+        setUserPhoto,
+        username,
+        setUserName,
+        email,
+        idCompany
       }}>
       {children}
     </AuthContext.Provider>

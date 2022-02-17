@@ -10,13 +10,13 @@ import PageNotFound from './components/PageNotFound';
 import PendingForApproval from './components/Profile/PendingForApproval';
 import CompanyInfo from './components/Profile/CompanyInfo';
 import Team from './components/Profile/Team';
-import Questions from './components/Profile/Questions';
+// import Questions from './components/Profile/Questions/Questions';
+import AddNewQuestion from './components/Profile/Questions/AddNewQuestion';
 import ProtectedRoute from './ProtectedRoute';
 
 function App() {
   const { isLoggedIn} = useContext(AuthContext);
 
-  //console.log('ApiEnv',process.env.REACT_APP_API_URL);
   return (
     <ChakraProvider>
       <Box backgroundColor="gray.200" width="100%" minH="100vh">
@@ -50,11 +50,19 @@ function App() {
                 </ProtectedRoute>
               }
             />
-            <Route
+            {/* <Route
               path="/questions"
               element={
                 <ProtectedRoute>
                   <Questions />
+                </ProtectedRoute>
+              }
+            /> */}
+            <Route
+              path="/questions/new"
+              element={
+                <ProtectedRoute>
+                  <AddNewQuestion />
                 </ProtectedRoute>
               }
             />

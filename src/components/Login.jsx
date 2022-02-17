@@ -18,17 +18,14 @@ const CHiOutlineMail = chakra(HiOutlineMail);
 const CFiLock = chakra(FiLock);
 
 const Login = () => {
+  const { loginFunction } = useAuthContext();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const { loginFunction } = useAuthContext();
   const [error, setError] = useState(false);
   const handleLogIn = (e) => {
     e.preventDefault();
-    if (email === '' || password === '') {
+    if (!email || !password) {
       setError(true);
-      setTimeout(() => {
-        setError(false);
-      }, 5000);
       return false;
     } else {
       const data = {
