@@ -6,6 +6,7 @@ import { login, register } from '../services/auth';
 import { getProfileById, createNewProfile } from '../services/profile';
 import { createCompany } from '../services/company';
 import { uploadUserPhoto } from '../services/upload';
+import { useTeamContext } from '../components/Profile/Team/TeamContextProvider';
 
 const AuthContext = createContext();
 const useAuthContext = () => useContext(AuthContext);
@@ -17,8 +18,9 @@ const AuthProvider = ({ children }) => {
   const [email, setEmail] = useState();
   const [idCompany, setCompanyId] = useState();
   const navigate = useNavigate();
+  const { fetchDataTeam } = useTeamContext();
 
-  useEffect(() => {
+  const fetchData = () => {
     createAxios
       .get(process.env.REACT_APP_API_URL + '/api/users/me')
       .then((res) => {
@@ -36,17 +38,19 @@ const AuthProvider = ({ children }) => {
         setUser(null);
         setIsLoggedIn(false);
       });
+  };
+  useEffect(() => {
+    fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const registerFunction = async (payload, formData) => {
     try {
-      let authUser = await register(payload);
+      const authUser = await register(payload);
       setEmail(authUser.data.user.email);
       setIsLoggedIn(true);
       setUser(authUser.data);
       setUserName(authUser.data.user.username);
-      console.log('user', authUser);
       console.log('id usera', authUser.data.user.id);
       localStorage.setItem('token', authUser.data.jwt);
       const photoResponse = await uploadUserPhoto(formData);
@@ -71,21 +75,24 @@ const AuthProvider = ({ children }) => {
   const loginFunction = async (payload) => {
     try {
       const authUser = await login(payload);
-      if (authUser) {
-        setUser(authUser);
-        setEmail(authUser.data.user.email);
-        getProfileById(authUser.data.user.id).then((response) => {
+      localStorage.setItem('token', authUser.data.jwt);
+      getProfileById(authUser.data.user.id).then((response) => {
+        if(response.data.data[0]){
+          setUser(authUser);
+          setEmail(authUser.data.user.email);
           setUserName(response.data.data[0].attributes.name);
           setUserPhoto(response.data.data[0].attributes.profilePhoto.data.attributes.url);
           setCompanyId(response.data.data[0].attributes.company.data.id);
-        });
-        localStorage.setItem('token', authUser.data.jwt);
-        setIsLoggedIn(true);
-        console.log('id usera', authUser.data.user.id);
-        navigate('/my-profile');
-        const userProfile = await getProfileById(authUser.data.user.id);
-        console.log('id profila', userProfile.data.data[0].id);
-      }
+          setIsLoggedIn(true);
+          navigate('/my-profile');
+        }
+        else{
+          localStorage.removeItem('token');
+        }
+      });
+      const userProfile = await getProfileById(authUser.data.user.id);
+      console.log('id profila', userProfile.data.data[0].id);
+      fetchDataTeam();
     } catch (error) {
       console.error(error);
       setUser(null);

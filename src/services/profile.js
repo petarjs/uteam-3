@@ -22,12 +22,21 @@ export const getProfileById = async (userId) => {
     const response = await createAxios.get(`/api/profiles/`, {
       params: {
         'filters[user][id][$eq]': userId,
-        populate: ['profilePhoto', 'company']
+        populate: ['profilePhoto', 'company','answers']
       }
     });
     return response;
   } catch (error) {
     console.log('An error occurred:', error.response);
+  }
+};
+
+export const getProfiles = async () => {
+  try {
+    const response = await createAxios.get("/api/profiles");
+    return response.data;
+  } catch (error) {
+    console.log("An error occurred:", error.response);
   }
 };
 
@@ -76,5 +85,13 @@ export const getProfilesForCompany = async () => {
     return response.data;
   } catch (error) {
     console.log('An error occurred:', error.response);
+  }
+};
+
+export const deleteProfile = async (idProfile) => {
+  try {
+    await createAxios.delete(`api/profiles/${idProfile}`);
+  } catch (error) {
+    console.log(error);
   }
 };

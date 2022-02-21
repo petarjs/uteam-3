@@ -12,8 +12,9 @@ import {
 import { Link } from 'react-router-dom';
 import { FiLock } from 'react-icons/fi';
 import { HiOutlineMail } from 'react-icons/hi';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useAuthContext } from './UserContext';
+
 const CHiOutlineMail = chakra(HiOutlineMail);
 const CFiLock = chakra(FiLock);
 
@@ -35,7 +36,7 @@ const Login = () => {
       loginFunction(data);
     }
   };
-
+  
   return (
     <Flex justifyContent="center" alignItems="center">
       <Box color="teal.400" textAlign="center" width={{ base: '300px', sm: '400px' }}>
