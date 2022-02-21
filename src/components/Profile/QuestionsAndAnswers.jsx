@@ -16,9 +16,10 @@ import {
 import SideBar from './SideBar';
 import { AiOutlineArrowUp, AiOutlineArrowDown } from 'react-icons/ai';
 import { getQuestionsByCompanyID } from '../../services/questions';
-import { postAnswers, getAnswers } from '../../services/answers';
+import { postAnswers } from '../../services/answers';
 import { getProfileById } from '../../services/profile';
 import { useEffect, useState, useRef } from 'react';
+import { uploadUserPhoto } from '../../services/upload';
 import createAxios from '../../services/http';
 
 const QuestionsAndAnswers = () => {
@@ -46,6 +47,7 @@ const QuestionsAndAnswers = () => {
       setQuestionError('The field must not be empty');
     }
   };
+
   const indexDown = () => {
     if (allAnswers[index].answer) {
       if (index === 0) {
@@ -59,9 +61,19 @@ const QuestionsAndAnswers = () => {
     }
   };
 
-  const onChangeSave = (e) => {
+  const onChangeSave = async (e) => {
     let answers = allAnswers;
-    answers[index].answer = e.target.value;
+    console.log(answers);
+    console.log('da', allQuestions[index].attributes.type);
+    if (allQuestions[index].attributes.type === 'image') {
+      const formData = new FormData();
+      formData.append('files', files[0]);
+      const photoResponse = await uploadUserPhoto(formData);
+      console.log(photoResponse.data[0].url);
+      answers[index].answer = process.env.REACT_APP_API_URL + photoResponse.data[0].url;
+    } else {
+      answers[index].answer = e.target.value;
+    }
     setAllAnswers(answers);
     if (answers[index].answer) {
       setQuestionError('');
@@ -87,14 +99,19 @@ const QuestionsAndAnswers = () => {
   };
 
   const listQuestion = async () => {
+    const responseUser = await createAxios.get('/api/users/me');
+    const resProfile = await getProfileById(responseUser.data.id);
+    // console.log(resProfile.data.data[0].id)
+    const idProfile = resProfile.data.data[0].id;
     const getAllQuestions = await getQuestionsByCompanyID();
     console.log(getAllQuestions.data.data);
     setAllQuestions(getAllQuestions.data.data);
+
     let answers = [];
     for (let questionIndex in getAllQuestions.data.data) {
       answers.push({
-        // 'id':allQuestions[questionIndex].id,
         id: getAllQuestions.data.data[questionIndex].id,
+        profile: idProfile,
         answer: ''
       });
     }
@@ -118,9 +135,11 @@ const QuestionsAndAnswers = () => {
         profile: idProfile,
         answer: allAnswers[i].answer
       };
+      console.log(valueQuestion);
       const resPostAnswers = await postAnswers(valueQuestion);
-      if(resPostAnswers.status === 200){
+      if (resPostAnswers.status === 200) {
         onOpen();
+        console.log(resPostAnswers);
       }
     }
   };
@@ -223,7 +242,10 @@ const QuestionsAndAnswers = () => {
                         type="file"
                         ref={filePicker}
                         display="none"
-                        onChange={(e) => setFile(e.target.files)}
+                        onChange={(e) => {
+                          setFile(e.target.files);
+                          onChangeSave(e);
+                        }}
                       />
                     </InputGroup>
                   ) : (
@@ -239,21 +261,21 @@ const QuestionsAndAnswers = () => {
                       _focus={{ border: '1px solid #007C8C' }}
                     />
                   )}
-                    {questionError ? (
-                      <Box p="5px 5px 0 10px" color="red">{questionError}</Box>
-                    ) : (
-                      <Box>
-                        <Modal finalFocusRef={finalRef} isOpen={isOpen} onClose={onClose}>
-                          <ModalOverlay />
-                          <ModalContent width={{ base: '300px', sm: '400px' }} mt="200px">
-                            <ModalCloseButton />
-                            <ModalBody m="20px 0">
-                              Thank you!
-                            </ModalBody>
-                          </ModalContent>
-                        </Modal>
-                      </Box>
-                    )}
+                  {questionError ? (
+                    <Box p="5px 5px 0 10px" color="red">
+                      {questionError}
+                    </Box>
+                  ) : (
+                    <Box>
+                      <Modal finalFocusRef={finalRef} isOpen={isOpen} onClose={onClose}>
+                        <ModalOverlay />
+                        <ModalContent width={{ base: '300px', sm: '400px' }} mt="200px">
+                          <ModalCloseButton />
+                          <ModalBody m="20px 0">Thank you!</ModalBody>
+                        </ModalContent>
+                      </Modal>
+                    </Box>
+                  )}
                 </Box>
               </Box>
             </Flex>

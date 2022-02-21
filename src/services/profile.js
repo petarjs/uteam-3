@@ -22,7 +22,7 @@ export const getProfileById = async (userId) => {
     const response = await createAxios.get(`/api/profiles/`, {
       params: {
         'filters[user][id][$eq]': userId,
-        populate: ['profilePhoto', 'company']
+        populate: ['profilePhoto', 'company','answers']
       }
     });
     return response;
