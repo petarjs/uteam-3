@@ -33,9 +33,11 @@ const Nav = () => {
         <Box>
           {userPhoto && (
             <Img
-              src={`https://uteam-api-7nngy.ondigitalocean.app${userPhoto}`}
+              src={process.env.REACT_APP_API_URL + `${userPhoto}`}
               w="50px"
+              h="50px"
               mr="10px"
+              objectFit="cover"
               borderRadius="50%"
               alt="logo"
             />

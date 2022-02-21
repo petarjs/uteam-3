@@ -1,6 +1,6 @@
 // import { Flex, Box, Text, Button } from '@chakra-ui/react';
 // import { BiTrash, BiEdit } from 'react-icons/bi';
-// import { getQuestions, deleteQuestions } from '../../../services/questions';
+// import { deleteQuestions, getQuestionsByCompanyID } from '../../../services/questions';
 // import { useState, useEffect } from 'react';
 
 // const QuestionList = () => {
@@ -9,8 +9,9 @@
 //   // eslint-disable-next-line react-hooks/exhaustive-deps
 //   useEffect(async () => {
 //     try {
-//       const getAllQuestions = await getQuestions();
-//       setAllQuestions(getAllQuestions.data);
+//       const getAllQuestions = await getQuestionsByCompanyID();
+//       console.log(getAllQuestions);
+//       setAllQuestions(getAllQuestions.data.data);
 //     } catch (error) {
 //       return;
 //     }

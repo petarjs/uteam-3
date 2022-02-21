@@ -17,6 +17,7 @@ import { AuthContext } from '../UserContext';
 import { changeName, changeProfilePhoto, getProfileById } from '../../services/profile';
 import { uploadUserPhoto } from '../../services/upload';
 import createAxios from '../../services/http';
+import { useTeamContext } from './Team/TeamContextProvider';
 
 const CFiUser = chakra(FiUser);
 const CFiLock = chakra(FiLock);
@@ -26,11 +27,13 @@ const MyProfile = () => {
   const [files, setFile] = useState(null);
   const { username, setUserName, setUserPhoto, email } = useContext(AuthContext);
   const [newUserName, setNewUserName] = useState(username);
+  const { fetchDataTeam } = useTeamContext();
 
   const changeNameFunction = async (name) => {
     try {
       const authUser = await changeName(name);
       setUserName(authUser.data.data.attributes.name);
+      fetchDataTeam();
     } catch (error) {
       console.error(error);
     }
@@ -43,6 +46,7 @@ const MyProfile = () => {
       const responseUser = await createAxios.get(process.env.REACT_APP_API_URL + '/api/users/me');
       const responseProfile = await getProfileById(responseUser.data.id);
       setUserPhoto(responseProfile.data.data[0].attributes.profilePhoto.data.attributes.url);
+      fetchDataTeam();
     } catch (error) {
       console.error(error);
     }

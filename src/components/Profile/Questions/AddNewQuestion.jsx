@@ -16,7 +16,7 @@ import SideBar from '../SideBar';
 import { Link } from 'react-router-dom';
 import { useState, useRef, useContext, useEffect } from 'react';
 import { Select } from '@chakra-ui/react';
-import { addNewQuestion, getQuestions } from '../../../services/questions';
+import { addNewQuestion, getQuestions, getQuestionsByCompanyID } from '../../../services/questions';
 import { AuthContext } from '../../UserContext';
 
 const AddNewQuestion = () => {
@@ -33,6 +33,7 @@ const AddNewQuestion = () => {
     try {
       const getAllQuestions = await getQuestions();
       setAllQuestions(getAllQuestions.data);
+      console.log(getAllQuestions.data);
     } catch (error) {
       return;
     }
@@ -42,6 +43,7 @@ const AddNewQuestion = () => {
     const funForArray = async () => {
       const getAllQuestions = await getQuestions();
       setAllQuestions(getAllQuestions.data);
+      console.log(getAllQuestions);
     };
     funForArray();
     let array = [];
@@ -81,8 +83,12 @@ const AddNewQuestion = () => {
         setQuestionError('The fields must not be empty');
       }
       if (valueQuestion.text && valueQuestion.type) {
-        await addNewQuestion(valueQuestion);
-        onOpen();
+        const newQ = await addNewQuestion(valueQuestion);
+        if (newQ) {
+          onOpen();
+        } else {
+          setQuestionError('error');
+        }
       }
     } catch (error) {
       console.log(error);

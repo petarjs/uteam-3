@@ -31,6 +31,15 @@ export const getProfileById = async (userId) => {
   }
 };
 
+export const getProfiles = async () => {
+  try {
+    const response = await createAxios.get("/api/profiles");
+    return response.data;
+  } catch (error) {
+    console.log("An error occurred:", error.response);
+  }
+};
+
 export const changeName = async (name) => {
   try {
     const responseUser = await createAxios.get('/api/users/me');
@@ -76,5 +85,13 @@ export const getProfilesForCompany = async () => {
     return response.data;
   } catch (error) {
     console.log('An error occurred:', error.response);
+  }
+};
+
+export const deleteProfile = async (idProfile) => {
+  try {
+    await createAxios.delete(`api/profiles/${idProfile}`);
+  } catch (error) {
+    console.log(error);
   }
 };
