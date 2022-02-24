@@ -5,7 +5,7 @@ export const createCompany = async (company) => {
   try {
     const response = await createAxios.post('/api/companies', {
       data: {
-        name: `${company}'s Company`
+        name: `${company}`
       }
     });
     return response;

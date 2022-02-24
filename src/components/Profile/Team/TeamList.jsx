@@ -16,9 +16,12 @@ import { Link } from 'react-router-dom';
 import { useTeamContext } from './TeamContextProvider';
 import { deleteProfile } from '../../../services/profile';
 import { useRef } from 'react';
+import { useAuthContext } from '../../UserContext';
 
 const TeamList = () => {
   const { allMembers, setAllMembers, fetchDataTeam } = useTeamContext();
+  const { profileID } = useAuthContext();
+
   const longEnUSFormatter = new Intl.DateTimeFormat('en-US', {
     year: 'numeric',
     month: 'short',
@@ -55,6 +58,7 @@ const TeamList = () => {
             fontSize="16px"
             boxShadow="xl">
             <Box w="220px" h="220px" m="10px auto">
+              {console.log(profileID, member.id)}
               <Image
                 w="220"
                 h="220"
@@ -88,6 +92,7 @@ const TeamList = () => {
                 </Button>
               </Link>
               <Button
+                disabled={profileID === member.id}
                 color="white"
                 borderRadius="10px"
                 bg="red.400"

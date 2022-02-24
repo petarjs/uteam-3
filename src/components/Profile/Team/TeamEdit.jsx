@@ -1,5 +1,6 @@
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import { useTeamContext } from './TeamContextProvider';
+import { useAuthContext } from '../../UserContext';
 import { useState, useRef, useEffect } from 'react';
 import { FiUser } from 'react-icons/fi';
 import SideBar from '../SideBar';
@@ -29,6 +30,7 @@ import {
 const CFiUser = chakra(FiUser);
 
 const TeamEdit = (props) => {
+  const { profileID } = useAuthContext();
   const { allMembers, setAllMembers, fetchDataTeam } = useTeamContext();
   const { id } = useParams();
   const filePicker = useRef(null);
@@ -52,6 +54,7 @@ const TeamEdit = (props) => {
     try {
       const getAllQuestions = await getQuestionsByCompanyID();
       setAllQuestions(getAllQuestions.data.data);
+      console.log("pitanja",getAllQuestions.data)
     } catch (error) {
       return;
     }
@@ -103,7 +106,7 @@ const TeamEdit = (props) => {
   const clickAndDelete = (idProfile) => {
     deleteProfile(idProfile);
     onOpen();
-    navigate("/team");
+    navigate('/team');
     const newListProfiles = allMembers.filter((member) => {
       return member.id !== idProfile;
     });
@@ -164,7 +167,8 @@ const TeamEdit = (props) => {
                 </Select>
               </FormControl>
               <Button
-                m="0 10px"
+                disabled={profileID === data[0].id}
+                m="0 5px"
                 color="white"
                 borderRadius="10px"
                 bg="red.400"
@@ -175,6 +179,7 @@ const TeamEdit = (props) => {
               </Button>
               <Link to={'/team'}>
                 <Button
+                  m="0 5px"
                   color="white"
                   borderRadius="10px"
                   bg="teal.400"
@@ -309,7 +314,7 @@ const TeamEdit = (props) => {
                     borderBottom="1px solid #80CBC4"
                     fontSize="16px">
                     <Box mb="10px">Question - {questions.attributes.text}</Box>
-                    <Box>
+                    <Box d="flex" flexDirection="column" alignItems="center">
                       {questions.attributes.type === 'image' ? (
                         <InputGroup
                           border="1px solid #e2e8f0"
@@ -350,6 +355,17 @@ const TeamEdit = (props) => {
                           _focus={{ border: '1px solid #007C8C' }}
                         />
                       )}
+                      <Button
+                        onClick={saveBasicInfo}
+                        color="white"
+                        borderRadius="10px"
+                        bg="teal.400"
+                        p="3px 40px"
+                        mt="20px"
+                        _hover={{ bg: 'teal.600' }}
+                        _focus={{ outline: 'none' }}>
+                        Save
+                      </Button>
                     </Box>
                   </Box>
                 ))

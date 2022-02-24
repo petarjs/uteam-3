@@ -17,6 +17,7 @@ const AuthProvider = ({ children }) => {
   const [username, setUserName] = useState();
   const [email, setEmail] = useState();
   const [idCompany, setCompanyId] = useState();
+  const [profileID, setProfileID] =useState();
   const navigate = useNavigate();
   const { fetchDataTeam } = useTeamContext();
 
@@ -27,6 +28,7 @@ const AuthProvider = ({ children }) => {
         setUser(res.data);
         setEmail(res.data.email);
         getProfileById(res.data.id).then((response) => {
+          setProfileID(response.data.data[0].id)
           setUserName(response.data.data[0].attributes.name);
           setUserPhoto(response.data.data[0].attributes.profilePhoto.data.attributes.url);
           setCompanyId(response.data.data[0].attributes.company.data.id);
@@ -92,7 +94,9 @@ const AuthProvider = ({ children }) => {
       });
       const userProfile = await getProfileById(authUser.data.user.id);
       console.log('id profila', userProfile.data.data[0].id);
+      console.log('profila', userProfile.data.data[0]);
       fetchDataTeam();
+      fetchData();
     } catch (error) {
       console.error(error);
       setUser(null);
@@ -120,7 +124,8 @@ const AuthProvider = ({ children }) => {
         username,
         setUserName,
         email,
-        idCompany
+        idCompany,
+        profileID
       }}>
       {children}
     </AuthContext.Provider>

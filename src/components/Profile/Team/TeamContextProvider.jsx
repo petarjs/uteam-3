@@ -8,7 +8,7 @@ const TeamContextProvider = ({ children }) => {
   const fetchDataTeam = async () => {
     try {
       const listProfilesForCompany = await getProfilesForCompany();
-      console.log("listProfilesForCompany",listProfilesForCompany.data);
+      // console.log("listProfilesForCompany",listProfilesForCompany.data);
       setAllMembers(listProfilesForCompany.data);
     } catch (error) {
       return;
